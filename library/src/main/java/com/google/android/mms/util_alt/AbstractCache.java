@@ -16,7 +16,7 @@
 
 package com.google.android.mms.util_alt;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.util.HashMap;
 

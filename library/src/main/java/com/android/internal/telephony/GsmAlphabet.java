@@ -17,7 +17,7 @@
 package com.android.internal.telephony;
 
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 import android.util.SparseIntArray;
 
 import java.nio.ByteBuffer;

@@ -19,7 +19,7 @@ package com.android.mms.layout;
 import com.android.mms.logs.LogTag;
 
 import android.content.Context;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 public class HVGALayoutParameters implements LayoutParameters {
     private static final String TAG = LogTag.TAG;

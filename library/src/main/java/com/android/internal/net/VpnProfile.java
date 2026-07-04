@@ -18,7 +18,7 @@ package com.android.internal.net;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.nio.charset.Charset;
 

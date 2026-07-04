@@ -24,7 +24,7 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Base64;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.klinker.android.send_message.R;
 
@@ -601,7 +601,7 @@ public class MmsConfig {
             }
 
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "MmsConfig.getNai: nai=" + nai);
+                Log.v(TAG, "MmsConfig.getNai: present=" + !TextUtils.isEmpty(nai));
             }
 
             if (!TextUtils.isEmpty(nai)) {

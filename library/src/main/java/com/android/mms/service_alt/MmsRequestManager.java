@@ -109,7 +109,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             // Don't mark the transaction as failed if we failed to send it.
             // sendAcknowledgeInd(retrieveConf);
         } catch (Throwable t) {
-            com.klinker.android.logger.Log.e(TAG, "error", t);
+            android.util.Log.e(TAG, "error", t);
         }
 
         return false;

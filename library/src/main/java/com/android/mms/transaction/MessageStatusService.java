@@ -27,7 +27,7 @@ import android.net.Uri;
 import android.provider.Telephony.Sms;
 import android.provider.Telephony.Sms.Inbox;
 import android.telephony.SmsMessage;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.logs.LogTag;
 

@@ -23,7 +23,7 @@ import android.net.Uri;
 import android.provider.Telephony;
 
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.File;
 
@@ -40,7 +40,7 @@ public class MmsSentReceiver extends StatusUpdatedReceiver {
         Log.v(TAG, "MMS has finished sending, marking it as so, in the database");
 
         Uri uri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
-        Log.v(TAG, uri.toString());
+        Log.v(TAG, "message uri: " + LogRedaction.redactUri(uri));
 
         ContentValues values = new ContentValues(1);
         values.put(Telephony.Mms.MESSAGE_BOX, Telephony.Mms.MESSAGE_BOX_SENT);
@@ -48,7 +48,7 @@ public class MmsSentReceiver extends StatusUpdatedReceiver {
                 null, null);
 
         String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
-        Log.v(TAG, filePath);
+        Log.v(TAG, "temp file: " + LogRedaction.redactPath(filePath));
         new File(filePath).delete();
     }
 

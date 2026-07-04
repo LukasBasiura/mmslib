@@ -26,7 +26,7 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.util.ArrayMap;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.util.List;
 import java.util.Map;

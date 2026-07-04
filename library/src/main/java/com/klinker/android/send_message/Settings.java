@@ -19,7 +19,7 @@ package com.klinker.android.send_message;
 import android.net.wifi.WifiInfo;
 import android.os.Build;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 /**
  * Class to house all of the settings that can be used to send a message
@@ -394,15 +394,10 @@ public class Settings {
     }
 
     /**
-     * Enables or disables logging for debug purposes logs will be written both to your devices
-     * logcat log and an external file you can specify so that other users can assist with debugging easily
-     * if you would like
-     *
-     * @param debugLogging true to enable debug logging when sending and receiving messages
-     * @param path the external path on the sd card to write the log to
+     * @deprecated File and library-wide debug logging were removed; use platform logcat tags only.
      */
+    @Deprecated
     public static void setDebugLogging(boolean debugLogging, String path) {
-        Log.setDebug(debugLogging);
-        Log.setPath(path);
+        // No-op: avoids persisting message-related data to external storage.
     }
 }

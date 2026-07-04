@@ -104,7 +104,7 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
         final int subscriptionId = intent.getIntExtra(SUBSCRIPTION_ID, Utils.getDefaultSubscriptionId());
         final String locationUrl = intent.getStringExtra(EXTRA_LOCATION_URL);
         final String transactionId = intent.getStringExtra(EXTRA_TRANSACTION_ID);
-        Log.v(TAG, path);
+        Log.v(TAG, "download file: " + LogRedaction.redactPath(path));
 
         new Thread(() -> {
             FileInputStream reader = null;
@@ -361,7 +361,7 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
             // the MMS proxy-relay doesn't require an ACK.
             byte[] tranId = mRetrieveConf.getTransactionId();
             if (tranId != null) {
-                Log.v(TAG, "sending ACK to MMSC: " + mTransactionSettings.getMmscUrl());
+                Log.v(TAG, "sending ACK to MMSC: " + LogRedaction.redactUrl(mTransactionSettings.getMmscUrl()));
                 // Create M-Acknowledge.ind
                 com.google.android.mms.pdu_alt.AcknowledgeInd acknowledgeInd = null;
 

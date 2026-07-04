@@ -33,7 +33,7 @@ import org.w3c.dom.smil.ElementTime;
 import org.w3c.dom.smil.Time;
 import org.w3c.dom.smil.TimeList;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 /**
  * The SmilPlayer is responsible for playing, stopping, pausing and resuming a SMIL tree.

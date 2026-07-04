@@ -28,7 +28,7 @@ import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.MmsHttpException;
 

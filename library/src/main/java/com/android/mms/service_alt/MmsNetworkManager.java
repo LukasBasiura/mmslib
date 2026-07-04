@@ -24,8 +24,9 @@ import android.net.NetworkRequest;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.MmsNetworkException;
 import com.squareup.okhttp.ConnectionPool;
@@ -316,7 +317,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         if (mmsNetworkInfo != null) {
             apnName = mmsNetworkInfo.getExtraInfo();
         }
-        Log.d(TAG, "MmsNetworkManager: getApnName: " + apnName);
+        Log.d(TAG, "MmsNetworkManager: getApnName: resolved=" + !TextUtils.isEmpty(apnName));
         return apnName;
     }
 

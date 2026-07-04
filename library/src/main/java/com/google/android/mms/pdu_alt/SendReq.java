@@ -19,7 +19,7 @@ package com.google.android.mms.pdu_alt;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.google.android.mms.InvalidHeaderValueException;
 import com.klinker.android.send_message.Utils;

@@ -21,7 +21,7 @@ import static com.klinker.android.send_message.Transaction.getAddressSeparatorRe
 import android.graphics.Bitmap;
 import android.net.Uri;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

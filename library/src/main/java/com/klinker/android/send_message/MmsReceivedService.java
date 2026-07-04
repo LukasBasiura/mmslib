@@ -27,7 +27,7 @@ import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,7 +60,7 @@ public class MmsReceivedService extends IntentService {
         Log.v(TAG, "MMS has finished downloading, persisting it to the database");
 
         String path = intent.getStringExtra(EXTRA_FILE_PATH);
-        Log.v(TAG, path);
+        Log.v(TAG, "download file: " + LogRedaction.redactPath(path));
 
         FileInputStream reader = null;
         try {

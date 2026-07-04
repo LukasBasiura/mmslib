@@ -7,12 +7,13 @@ import android.content.SharedPreferences;
 import android.content.res.XmlResourceParser;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.widget.Toast;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -143,8 +144,7 @@ public class ApnUtils {
                     text = parser.getText();
                 }
 
-                Log.v(TAG, "tag: " + tag + " value: " + value + " - " +
-                        text);
+                Log.v(TAG, "mms_config entry: " + tag + "/" + value);
                 if ("name".equalsIgnoreCase(name)) {
                     if ("int".equals(tag)) {
                         // int config tags go here
@@ -328,7 +328,8 @@ public class ApnUtils {
             parser.close();
         }
 
-        Log.v(TAG, "MMSC: " + mmsc + ", MMS Proxy: " + proxy + ", MMS Port: " + port);
+        Log.v(TAG, "APN resolved (mmsc=" + LogRedaction.redactUrl(mmsc)
+                + ", proxy=" + (TextUtils.isEmpty(proxy) ? "none" : "set") + ")");
 
         String errorStr = null;
 

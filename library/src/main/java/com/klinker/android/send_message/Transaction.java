@@ -56,7 +56,7 @@ import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.smil.SmilHelper;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -250,7 +250,7 @@ public class Transaction {
             final Parcelable sentMessageParcelable,
             final Parcelable deliveredParcelable
     ) throws Exception {
-        Log.v("send_transaction", "message text: " + text);
+        Log.v("send_transaction", "sending SMS, length=" + (text != null ? text.length() : 0));
         if (saveMessage) {
             // save the message for each of the addresses
             for (String address : addresses) {
@@ -286,12 +286,12 @@ public class Transaction {
                 values.put(Telephony.Sms.SUBSCRIPTION_ID, subscriptionId);
             }
 
-            Log.v("send_transaction", "saving message with thread id: " + threadId);
+            Log.v("send_transaction", "saving message to thread");
 
             values.put(Telephony.Sms.THREAD_ID, threadId);
             messageUri = context.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
-            Log.v("send_transaction", "inserted to uri: " + messageUri);
+            Log.v("send_transaction", "inserted message: " + LogRedaction.redactUri(messageUri));
 
             Cursor query = context.getContentResolver().query(messageUri, new String[]{"_id"}, null, null, null);
             if (query != null) {
@@ -301,7 +301,7 @@ public class Transaction {
                 query.close();
             }
 
-            Log.v("send_transaction", "message id: " + messageId);
+            Log.v("send_transaction", "message persisted");
 
             // set up sent and delivered pending intents to be used with message request
             Intent sentIntent;
@@ -620,7 +620,7 @@ public class Transaction {
                         true, settings.getGroup(), null, settings.getSubscriptionId());
             } else {
                 messageUri = existingMessageUri;
-                Log.v(TAG, messageUri.toString());
+                Log.v(TAG, "MMS saved: " + LogRedaction.redactUri(messageUri));
 
                 // update message status to outbox in os database as we are trying to resend the same message
                 ContentValues values = new ContentValues(1);

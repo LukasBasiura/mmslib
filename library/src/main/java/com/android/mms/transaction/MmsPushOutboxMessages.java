@@ -20,7 +20,7 @@ import com.android.mms.logs.LogTag;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 /**
  * MmsPushOutboxMessages listens for MMS_SEND_OUTBOX_MSG intent .

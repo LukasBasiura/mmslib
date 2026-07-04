@@ -17,7 +17,7 @@
 package android.net;
 
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;

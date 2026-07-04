@@ -20,7 +20,7 @@ import android.content.Context;
 import android.net.NetworkUtilsHelper;
 import android.provider.Telephony;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.MmsConfig;
 import com.klinker.android.send_message.Transaction;

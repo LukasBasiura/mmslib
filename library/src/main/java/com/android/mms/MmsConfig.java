@@ -24,7 +24,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 public class MmsConfig {
     private static final String TAG = "MmsConfig";

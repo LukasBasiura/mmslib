@@ -20,7 +20,7 @@ import android.content.ContentUris;
 import android.content.UriMatcher;
 import android.net.Uri;
 import android.provider.Telephony.Mms;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;

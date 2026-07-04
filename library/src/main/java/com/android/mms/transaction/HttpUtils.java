@@ -40,7 +40,7 @@ import android.net.http.AndroidHttpClient;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Config;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.MmsConfig;
@@ -100,13 +100,13 @@ public class HttpUtils {
         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
             Log.v(TAG, "httpConnection: params list");
             Log.v(TAG, "\ttoken\t\t= " + token);
-            Log.v(TAG, "\turl\t\t= " + url);
+            Log.v(TAG, "\turl\t\t= "
+                    + com.klinker.android.send_message.LogRedaction.redactUrl(url));
             Log.v(TAG, "\tmethod\t\t= "
                     + ((method == HTTP_POST_METHOD) ? "POST"
                             : ((method == HTTP_GET_METHOD) ? "GET" : "UNKNOWN")));
             Log.v(TAG, "\tisProxySet\t= " + isProxySet);
-            Log.v(TAG, "\tproxyHost\t= " + proxyHost);
-            Log.v(TAG, "\tproxyPort\t= " + proxyPort);
+            Log.v(TAG, "\tproxy\t\t= " + (isProxySet ? "set" : "none"));
             // TODO Print out binary data more readable.
             //Log.v(TAG, "\tpdu\t\t= " + Arrays.toString(pdu));
         }

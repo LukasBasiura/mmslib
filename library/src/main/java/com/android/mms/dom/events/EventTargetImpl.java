@@ -25,7 +25,7 @@ import org.w3c.dom.events.EventException;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 public class EventTargetImpl implements EventTarget {
     private static final String TAG = LogTag.TAG;

@@ -20,7 +20,7 @@ import com.android.mms.logs.LogTag;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 /**
  * MMS presentation layout management.

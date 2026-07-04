@@ -25,7 +25,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import com.android.mms.service_alt.exception.ApnException;
 
@@ -122,7 +122,7 @@ public class ApnSettings {
             return new ApnSettings(mmsc, mmsProxy, parsePort(mmsPort), "Legacy shared preferences");
         }
 
-        Log.v(TAG, "ApnSettings: apnName " + apnName);
+        Log.v(TAG, "ApnSettings: loading from provider, hasApnName=" + !TextUtils.isEmpty(apnName));
         // TODO: CURRENT semantics is currently broken in telephony. Revive this when it is fixed.
         //String selection = Telephony.Carriers.CURRENT + " IS NOT NULL";
         String selection = null;

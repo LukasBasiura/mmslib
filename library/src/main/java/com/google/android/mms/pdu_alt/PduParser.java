@@ -20,7 +20,7 @@ import com.android.mms.util.ExternalLogger;
 import com.google.android.mms.ContentType;
 import com.google.android.mms.InvalidHeaderValueException;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -262,7 +262,7 @@ public class PduParser {
                 pduDataStream.reset();
                 byte [] bVal = parseWapString(pduDataStream, TYPE_TEXT_STRING);
                 if (LOCAL_LOGV) {
-                    Log.v(LOG_TAG, "TextHeader: " + new String(bVal));
+                    Log.v(LOG_TAG, "TextHeader: len=" + (bVal != null ? bVal.length : 0));
                 }
                 /* we should ignore it at the moment */
                 continue;
@@ -471,8 +471,7 @@ public class PduParser {
                         if (null != address) {
                             String str = new String(address);
                             if (LOCAL_LOGV) {
-                                Log.v(LOG_TAG, "parseHeaders: (to/cc/bcc) address: " + headerField
-                                        + " value: " + str);
+                                Log.v(LOG_TAG, "parseHeaders: (to/cc/bcc) field=" + headerField);
                             }
                             int endIndex = str.indexOf("/");
                             if (endIndex > 0) {
@@ -580,8 +579,7 @@ public class PduParser {
 
                     try {
                         if (LOCAL_LOGV) {
-                            Log.v(LOG_TAG, "parseHeaders: from address: " + headerField
-                                    + " value: " + from.getString());
+                            Log.v(LOG_TAG, "parseHeaders: from field=" + headerField);
                         }
                         headers.setEncodedStringValue(from, PduHeaders.FROM);
                     } catch(NullPointerException e) {
@@ -962,7 +960,7 @@ public class PduParser {
      */
     private static void log(String text) {
         if (LOCAL_LOGV) {
-            Log.v(LOG_TAG, text);
+            Log.v(LOG_TAG, "pdu: " + (text != null ? text.length() : 0) + " chars");
         }
     }
 

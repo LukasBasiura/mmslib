@@ -54,7 +54,7 @@ import com.google.android.mms.pdu_alt.NotificationInd;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.R;
 import com.klinker.android.send_message.Settings;
@@ -809,8 +809,9 @@ public class TransactionService extends Service implements Observer {
                         TransactionSettings transactionSettings;
 
                         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
-                            Log.v(TAG, "EVENT_TRANSACTION_REQUEST MmscUrl=" +
-                                    args.getMmscUrl() + " proxy port: " + args.getProxyAddress());
+                            Log.v(TAG, "EVENT_TRANSACTION_REQUEST mmsc="
+                                    + com.klinker.android.send_message.LogRedaction.redactUrl(args.getMmscUrl())
+                                    + " proxy=" + (TextUtils.isEmpty(args.getProxyAddress()) ? "none" : "set"));
                         }
 
                         // Set the connection settings for this transaction.

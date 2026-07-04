@@ -22,7 +22,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.smil.SMILDocument;
 import org.w3c.dom.smil.SMILRegionElement;
 
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 public class SmilRegionElementImpl extends SmilElementImpl implements
         SMILRegionElement {

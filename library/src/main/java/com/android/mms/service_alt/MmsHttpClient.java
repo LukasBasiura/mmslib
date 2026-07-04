@@ -119,7 +119,7 @@ public class MmsHttpClient {
             String proxyHost, int proxyPort, MmsConfig.Overridden mmsConfig)
             throws MmsHttpException {
         Log.d(TAG, "HTTP: " + method + " " + redactUrlForNonVerbose(urlString)
-                + (isProxySet ? (", proxy=" + proxyHost + ":" + proxyPort) : "")
+                + (isProxySet ? ", proxy=set" : "")
                 + ", PDU size=" + (pdu != null ? pdu.length : 0));
         checkMethod(method);
         HttpURLConnection connection = null;
@@ -482,26 +482,6 @@ public class MmsHttpClient {
      * @return
      */
     public static String redactUrlForNonVerbose(String urlString) {
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            // Don't redact for VERBOSE level logging
-            return urlString;
-        }
-        if (TextUtils.isEmpty(urlString)) {
-            return urlString;
-        }
-        String protocol = "http";
-        String host = "";
-        try {
-            final URL url = new URL(urlString);
-            protocol = url.getProtocol();
-            host = url.getHost();
-        } catch (MalformedURLException e) {
-            // Ignore
-        }
-        // Print "http://host[length]"
-        final StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append("://").append(host)
-                .append("[").append(urlString.length()).append("]");
-        return sb.toString();
+        return com.klinker.android.send_message.LogRedaction.redactUrl(urlString);
     }
 }

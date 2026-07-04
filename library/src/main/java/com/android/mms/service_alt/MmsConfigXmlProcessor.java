@@ -20,7 +20,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.ContentValues;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 
 import java.io.IOException;
 

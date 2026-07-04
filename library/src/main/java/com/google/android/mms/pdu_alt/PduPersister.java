@@ -49,7 +49,7 @@ import com.google.android.mms.util_alt.DrmConvertSession;
 import com.google.android.mms.util_alt.PduCache;
 import com.google.android.mms.util_alt.PduCacheEntry;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import android.util.Log;
 import com.klinker.android.send_message.Settings;
 
 import java.io.ByteArrayOutputStream;
