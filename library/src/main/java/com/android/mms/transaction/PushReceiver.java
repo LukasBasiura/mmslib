@@ -230,11 +230,12 @@ public class PushReceiver extends BroadcastReceiver {
                             } else {
                                 Log.v(TAG, "receiving with lollipop method");
                                 MmsRequestManager requestManager = new MmsRequestManager(mContext);
+                                final int resolvedSubId = Utils.resolveSubscriptionId(subId);
                                 DownloadRequest request = new DownloadRequest(requestManager,
-                                        Utils.getDefaultSubscriptionId(),
+                                        resolvedSubId,
                                         location, transactionId, uri, null, null,
                                         null, mContext);
-                                MmsNetworkManager manager = new MmsNetworkManager(mContext, Utils.getDefaultSubscriptionId());
+                                MmsNetworkManager manager = new MmsNetworkManager(mContext, resolvedSubId);
                                 request.execute(mContext, manager);
                             }
                         } else if (LOCAL_LOGV) {

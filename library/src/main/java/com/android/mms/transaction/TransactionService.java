@@ -349,13 +349,14 @@ public class TransactionService extends Service implements Observer {
                                     Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
                                             cursor.getLong(columnIndexOfMsgId));
                                     MmsRequestManager requestManager = new MmsRequestManager(this);
+                                    final int resolvedSubId = Utils.resolveSubscriptionId(subId);
                                     DownloadRequest request = new DownloadRequest(requestManager,
-                                            Utils.getDefaultSubscriptionId(),
+                                            resolvedSubId,
                                             PushReceiver.getContentLocation(this, uri),
                                             PushReceiver.getTransactionId(this, uri),
                                             uri, null, null,
                                             null, this);
-                                    MmsNetworkManager manager = new MmsNetworkManager(this, Utils.getDefaultSubscriptionId());
+                                    MmsNetworkManager manager = new MmsNetworkManager(this, resolvedSubId);
                                     request.execute(this, manager);
 
                                     // can't handle many messages at once.

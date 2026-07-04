@@ -1,1 +1,5 @@
-jdk: openjdk17
+jdk:
+  - openjdk17
+
+install:
+  - ./gradlew :library:clean :library:assembleRelease :library:publishReleasePublicationToMavenLocal --stacktrace

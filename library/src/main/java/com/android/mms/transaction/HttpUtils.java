@@ -116,9 +116,12 @@ public class HttpUtils {
         try {
             // Make sure to use a proxy which supports CONNECT.
             URI hostUrl = new URI(url);
+            String scheme = hostUrl.getScheme();
+            if (TextUtils.isEmpty(scheme)) {
+                scheme = HttpHost.DEFAULT_SCHEME_NAME;
+            }
             HttpHost target = new HttpHost(
-                    hostUrl.getHost(), hostUrl.getPort(),
-                    HttpHost.DEFAULT_SCHEME_NAME);
+                    hostUrl.getHost(), hostUrl.getPort(), scheme);
 
             client = createHttpClient(context);
             HttpRequest req = null;

@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -35,6 +36,7 @@ import com.klinker.android.send_message.Utils;
 
 import com.android.mms.service_alt.exception.ApnException;
 import com.android.mms.service_alt.exception.MmsHttpException;
+import com.android.mms.service_alt.exception.MmsNetworkException;
 
 /**
  * Base class for MMS requests. This has the common logic of sending/downloading MMS.
@@ -179,22 +181,20 @@ public abstract class MmsRequest {
             // Try multiple times of MMS HTTP request
             for (int i = 0; i < RETRY_TIMES; i++) {
                 try {
-                    try {
-                        networkManager.acquireNetwork();
-                    } catch (Exception e) {
-                        Log.e(TAG, "error acquiring network", e);
+                    Network network = networkManager.acquireNetwork();
+                    if (network == null) {
+                        throw new MmsNetworkException("MMS network is not available");
                     }
+                    Utils.bindProcessToMmsNetwork(context, network);
 
-                    final String apnName = networkManager.getApnName();
                     try {
-                        ApnSettings apn = null;
+                        final String apnName = networkManager.getApnName();
+                        ApnSettings apn;
                         try {
                             apn = ApnSettings.load(context, apnName, mSubId);
                         } catch (ApnException e) {
-                            // If no APN could be found, fall back to trying without the APN name
                             if (apnName == null) {
-                                // If the APN name was already null then don't need to retry
-                                throw (e);
+                                throw e;
                             }
                             Log.i(TAG, "MmsRequest: No match with APN name:"
                                     + apnName + ", try with no name");
@@ -203,24 +203,26 @@ public abstract class MmsRequest {
                         Log.i(TAG, "MmsRequest: using " + apn.toString());
                         response = doHttp(context, networkManager, apn);
                         result = Activity.RESULT_OK;
-                        // Success
                         break;
                     } finally {
+                        Utils.unbindProcessFromMmsNetwork(context);
                         networkManager.releaseNetwork();
                     }
                 } catch (ApnException e) {
                     Log.e(TAG, "MmsRequest: APN failure", e);
                     result = SmsManager.MMS_ERROR_INVALID_APN;
                     break;
-//                    } catch (MmsNetworkException e) {
-//                        Log.e(TAG, "MmsRequest: MMS network acquiring failure", e);
-//                        result = SmsManager.MMS_ERROR_UNABLE_CONNECT_MMS;
-//                        // Retry
+                } catch (MmsNetworkException e) {
+                    Log.e(TAG, "MmsRequest: MMS network acquiring failure", e);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        result = SmsManager.MMS_ERROR_UNABLE_CONNECT_MMS;
+                    } else {
+                        result = SmsManager.MMS_ERROR_HTTP_FAILURE;
+                    }
                 } catch (MmsHttpException e) {
                     Log.e(TAG, "MmsRequest: HTTP or network I/O failure", e);
                     result = SmsManager.MMS_ERROR_HTTP_FAILURE;
                     httpStatusCode = e.getStatusCode();
-                    // Retry
                 } catch (Exception e) {
                     Log.e(TAG, "MmsRequest: unexpected failure", e);
                     result = SmsManager.MMS_ERROR_UNSPECIFIED;

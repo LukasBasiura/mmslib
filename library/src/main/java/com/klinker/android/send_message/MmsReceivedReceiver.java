@@ -227,12 +227,14 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
     private static abstract class CommonAsyncTask extends AsyncTask<Void, Void, Void> {
         protected final Context mContext;
         protected final TransactionSettings mTransactionSettings;
+        protected final int mSubscriptionId;
         final NotificationInd mNotificationInd;
         final String mContentLocation;
 
-        CommonAsyncTask(Context context, TransactionSettings settings, NotificationInd ind) {
+        CommonAsyncTask(Context context, TransactionSettings settings, NotificationInd ind, int subscriptionId) {
             mContext = context;
             mTransactionSettings = settings;
+            mSubscriptionId = subscriptionId;
             mNotificationInd = ind;
             mContentLocation = new String(ind.getContentLocation());
         }
@@ -297,20 +299,25 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
                         false, null, 0);
             }
 
-            Utils.ensureRouteToHost(mContext, mmscUrl, mTransactionSettings.getProxyAddress());
-            return HttpUtils.httpConnection(
-                    mContext, token,
-                    mmscUrl,
-                    pdu, HttpUtils.HTTP_POST_METHOD,
-                    mTransactionSettings.isProxySet(),
-                    mTransactionSettings.getProxyAddress(),
-                    mTransactionSettings.getProxyPort());
+            return Utils.ensureRouteToMmsNetwork(mContext, mmscUrl, mTransactionSettings.getProxyAddress(),
+                    mSubscriptionId, new Utils.Task<byte[]>() {
+                @Override
+                public byte[] run() throws IOException {
+                    return HttpUtils.httpConnection(
+                            mContext, token,
+                            mmscUrl,
+                            pdu, HttpUtils.HTTP_POST_METHOD,
+                            mTransactionSettings.isProxySet(),
+                            mTransactionSettings.getProxyAddress(),
+                            mTransactionSettings.getProxyPort());
+                }
+            });
         }
     }
 
     private static class NotifyRespTask extends CommonAsyncTask {
-        NotifyRespTask(Context context, NotificationInd ind, TransactionSettings settings) {
-            super(context, settings, ind);
+        NotifyRespTask(Context context, NotificationInd ind, TransactionSettings settings, int subscriptionId) {
+            super(context, settings, ind, subscriptionId);
         }
 
         @Override
@@ -341,8 +348,9 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
     private static class AcknowledgeIndTask extends CommonAsyncTask {
         private final RetrieveConf mRetrieveConf;
 
-        AcknowledgeIndTask(Context context, NotificationInd ind, TransactionSettings settings, RetrieveConf rc) {
-            super(context, settings, ind);
+        AcknowledgeIndTask(Context context, NotificationInd ind, TransactionSettings settings,
+                           RetrieveConf rc, int subscriptionId) {
+            super(context, settings, ind, subscriptionId);
             mRetrieveConf = rc;
         }
 
@@ -413,8 +421,9 @@ public abstract class MmsReceivedReceiver extends BroadcastReceiver {
             final TransactionSettings transactionSettings = new TransactionSettings(mmsc.mmscUrl, mmsc.mmsProxy, mmsc.proxyPort);
 
             final List<CommonAsyncTask> responseTasks = new ArrayList<>();
-            responseTasks.add(new AcknowledgeIndTask(context, ind, transactionSettings, (RetrieveConf) pdu));
-            responseTasks.add(new NotifyRespTask(context, ind, transactionSettings));
+            responseTasks.add(new AcknowledgeIndTask(context, ind, transactionSettings,
+                    (RetrieveConf) pdu, subscriptionId));
+            responseTasks.add(new NotifyRespTask(context, ind, transactionSettings, subscriptionId));
 
             return responseTasks;
         } catch (MmsException e) {

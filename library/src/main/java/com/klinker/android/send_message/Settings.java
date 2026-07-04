@@ -283,6 +283,10 @@ public class Settings {
         return this.mmsc;
     }
 
+    public boolean hasMmsConfiguration() {
+        return mmsc != null && !mmsc.trim().isEmpty();
+    }
+
     /**
      * @return the proxy to send MMS through
      */

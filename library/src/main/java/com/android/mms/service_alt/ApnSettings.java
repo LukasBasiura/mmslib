@@ -93,12 +93,33 @@ public class ApnSettings {
      */
     public static ApnSettings load(Context context, String apnName, int subId)
             throws ApnException {
+        if (com.klinker.android.send_message.Transaction.settings != null
+                && !TextUtils.isEmpty(com.klinker.android.send_message.Transaction.settings.getMmsc())) {
+            final com.klinker.android.send_message.Settings activeSettings =
+                    com.klinker.android.send_message.Transaction.settings;
+            return new ApnSettings(
+                    activeSettings.getMmsc(),
+                    activeSettings.getProxy(),
+                    parsePort(activeSettings.getPort()),
+                    "Active transaction settings");
+        }
+
+        final com.klinker.android.send_message.MmsApn savedApn =
+                com.klinker.android.send_message.MmsApnResolver.getSavedApn(context, subId);
+        if (savedApn != null && savedApn.isValid()) {
+            return new ApnSettings(
+                    savedApn.getMmsc(),
+                    savedApn.getProxy(),
+                    parsePort(savedApn.getPort()),
+                    "Saved APN for subId " + subId);
+        }
+
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         String mmsc = sharedPrefs.getString("mmsc_url", "");
         if (!TextUtils.isEmpty(mmsc)) {
             String mmsProxy = sharedPrefs.getString("mms_proxy", "");
             String mmsPort = sharedPrefs.getString("mms_port", "");
-            return new ApnSettings(mmsc, mmsProxy, parsePort(mmsPort), "Default from settings");
+            return new ApnSettings(mmsc, mmsProxy, parsePort(mmsPort), "Legacy shared preferences");
         }
 
         Log.v(TAG, "ApnSettings: apnName " + apnName);

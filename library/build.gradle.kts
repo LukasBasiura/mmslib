@@ -3,8 +3,9 @@ plugins {
     id("maven-publish")
 }
 
-group = "org.fossify"
-version = "1.0.0"
+// JitPack sets GROUP, VERSION (and JITPACK=true) in the build environment.
+group = System.getenv("GROUP")?.takeIf { it.isNotBlank() } ?: "com.github.LukasBasiura.mmslib"
+version = System.getenv("VERSION")?.takeIf { it.isNotBlank() } ?: "1.0.0-SNAPSHOT"
 
 android {
     compileSdk = 34
@@ -43,6 +44,9 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release") {
+                groupId = project.group.toString()
+                artifactId = "library"
+                version = project.version.toString()
                 from(components["release"])
             }
         }

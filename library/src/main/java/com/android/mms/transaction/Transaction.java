@@ -183,7 +183,8 @@ public abstract class Transaction extends Observable {
                     false, null, 0);
         }
 
-        return Utils.ensureRouteToMmsNetwork(mContext, mmscUrl, mTransactionSettings.getProxyAddress(), new Utils.Task<byte[]>() {
+        return Utils.ensureRouteToMmsNetwork(mContext, mmscUrl, mTransactionSettings.getProxyAddress(),
+                resolveSubscriptionId(), new Utils.Task<byte[]>() {
             @Override
             public byte[] run() throws IOException {
                 return HttpUtils.httpConnection(
@@ -223,7 +224,8 @@ public abstract class Transaction extends Observable {
                     0);
         }
 
-        return Utils.ensureRouteToMmsNetwork(mContext, url, mTransactionSettings.getProxyAddress(), new Utils.Task<byte[]>() {
+        return Utils.ensureRouteToMmsNetwork(mContext, url, mTransactionSettings.getProxyAddress(),
+                resolveSubscriptionId(), new Utils.Task<byte[]>() {
             @Override
             public byte[] run() throws IOException {
                 return HttpUtils.httpConnection(
@@ -237,6 +239,14 @@ public abstract class Transaction extends Observable {
                         mTransactionSettings.getProxyPort());
             }
         });
+    }
+
+    private static int resolveSubscriptionId() {
+        if (com.klinker.android.send_message.Transaction.settings != null) {
+            return Utils.resolveSubscriptionId(
+                    com.klinker.android.send_message.Transaction.settings.getSubscriptionId());
+        }
+        return Utils.getDefaultSubscriptionId();
     }
 
     public static boolean useWifi(Context context) {

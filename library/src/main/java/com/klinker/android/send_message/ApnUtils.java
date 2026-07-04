@@ -19,14 +19,32 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * @deprecated Use {@link MmsApnResolver} for data and host-app UI for selection.
+ */
+@Deprecated
 public class ApnUtils {
 
     private static final String TAG = "ApnUtils";
 
+    /**
+     * @deprecated Use {@link MmsApnResolver#loadAvailableApns(Context, int)} and host-app UI instead.
+     */
+    @Deprecated
     public static void initDefaultApns(final Context context, final OnApnFinishedListener listener) {
+        initDefaultApns(context, Utils.getDefaultSubscriptionId(), listener);
+    }
+
+    /**
+     * @deprecated Use {@link MmsApnResolver} and host-app UI instead.
+     */
+    @Deprecated
+    public static void initDefaultApns(final Context context, final int subscriptionId,
+                                       final OnApnFinishedListener listener) {
         loadMmsSettings(context);
-        final ArrayList<APN> apns = loadApns(context);
+        final ArrayList<APN> apns = toLegacyApns(MmsApnResolver.loadAvailableApns(context, subscriptionId));
 
         if (apns == null || apns.size() == 0) {
             Log.v(TAG, "Found no APNs :( Damn CDMA network probably.");
@@ -60,10 +78,10 @@ public class ApnUtils {
 
     private static void showApnChooser(final Context context, final ArrayList<APN> apns, final OnApnFinishedListener listener) {
         CharSequence[] items = new CharSequence[apns.size()];
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String curMmsc = sharedPrefs.getString("mmsc_url", "");
-        String curProxy = sharedPrefs.getString("mms_proxy", "");
-        String curPort = sharedPrefs.getString("mms_port", "");
+        final MmsApn saved = MmsApnResolver.getSavedApn(context, Utils.getDefaultSubscriptionId());
+        String curMmsc = saved != null ? saved.getMmsc() : "";
+        String curProxy = saved != null ? saved.getProxy() : "";
+        String curPort = saved != null ? saved.getPort() : "";
 
         int defaultApn = -1;
         for (int i = 0; i < items.length; i++) {
@@ -338,12 +356,33 @@ public class ApnUtils {
     }
 
     private static void setApns(Context context, APN apn) {
+        MmsApnResolver.saveSelectedApn(
+                context,
+                Utils.getDefaultSubscriptionId(),
+                new MmsApn(apn.name, apn.mmsc, apn.proxy, apn.port,
+                        Utils.getDefaultSubscriptionId()));
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString("mmsc_url", apn.mmsc)
                 .putString("mms_proxy", apn.proxy)
                 .putString("mms_port", apn.port)
                 .commit();
+    }
+
+    private static ArrayList<APN> toLegacyApns(List<MmsApn> apns) {
+        final ArrayList<APN> legacy = new ArrayList<>();
+        if (apns == null) {
+            return legacy;
+        }
+        for (MmsApn apn : apns) {
+            APN item = new APN();
+            item.name = apn.getName();
+            item.mmsc = apn.getMmsc();
+            item.proxy = apn.getProxy();
+            item.port = apn.getPort();
+            legacy.add(item);
+        }
+        return legacy;
     }
 
     private static void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException {

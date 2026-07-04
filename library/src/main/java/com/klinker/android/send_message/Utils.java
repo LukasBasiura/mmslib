@@ -80,49 +80,78 @@ public class Utils {
     }
 
     public static <T> T ensureRouteToMmsNetwork(Context context, String url, String proxy, Task<T> task) throws IOException {
+        return ensureRouteToMmsNetwork(context, url, proxy, getDefaultSubscriptionId(), task);
+    }
+
+    public static <T> T ensureRouteToMmsNetwork(Context context, String url, String proxy, int subId, Task<T> task) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return ensureRouteToMmsNetworkMarshmallow(context, task);
+            return ensureRouteToMmsNetworkMarshmallow(context, subId, task);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return ensureRouteToMmsNetworkLollipop(context, task);
+            return ensureRouteToMmsNetworkLollipop(context, subId, task);
         } else {
             ensureRouteToHost(context, url, proxy);
             return task.run();
         }
     }
 
+    public static int resolveSubscriptionId(int settingsSubId) {
+        if (settingsSubId != Settings.DEFAULT_SUBSCRIPTION_ID) {
+            return settingsSubId;
+        }
+        return getDefaultSubscriptionId();
+    }
+
+    public static void bindProcessToMmsNetwork(Context context, Network network) {
+        if (network == null) {
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            connectivityManager.bindProcessToNetwork(network);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ConnectivityManager.setProcessDefaultNetwork(network);
+        }
+    }
+
+    public static void unbindProcessFromMmsNetwork(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            connectivityManager.bindProcessToNetwork(null);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ConnectivityManager.setProcessDefaultNetwork(null);
+        }
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
-    private static <T> T ensureRouteToMmsNetworkMarshmallow(Context context, Task<T> task) throws IOException {
-        final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), Utils.getDefaultSubscriptionId());
-        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private static <T> T ensureRouteToMmsNetworkMarshmallow(Context context, int subId, Task<T> task) throws IOException {
+        final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), subId);
         Network network = null;
         try {
             network = networkManager.acquireNetwork();
-            connectivityManager.bindProcessToNetwork(network);
+            bindProcessToMmsNetwork(context, network);
             return task.run();
         } catch (MmsNetworkException e) {
             throw new IOException(e);
         } finally {
-            if (network != null) {
-                connectivityManager.bindProcessToNetwork(null);
-            }
+            unbindProcessFromMmsNetwork(context);
             networkManager.releaseNetwork();
         }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static <T> T ensureRouteToMmsNetworkLollipop(Context context, Task<T> task) throws IOException {
-        final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), Utils.getDefaultSubscriptionId());
+    private static <T> T ensureRouteToMmsNetworkLollipop(Context context, int subId, Task<T> task) throws IOException {
+        final MmsNetworkManager networkManager = new MmsNetworkManager(context.getApplicationContext(), subId);
         Network network = null;
         try {
             network = networkManager.acquireNetwork();
-            ConnectivityManager.setProcessDefaultNetwork(network);
+            bindProcessToMmsNetwork(context, network);
             return task.run();
         } catch (MmsNetworkException e) {
             throw new IOException(e);
         } finally {
-            if (network != null) {
-                ConnectivityManager.setProcessDefaultNetwork(null);
-            }
+            unbindProcessFromMmsNetwork(context);
             networkManager.releaseNetwork();
         }
     }
@@ -152,8 +181,10 @@ public class Utils {
                 if (!((Boolean) requestRoute.invoke(connMgr, ConnectivityManager.TYPE_MOBILE_MMS, inetAddr))) {
                     throw new IOException("Cannot establish route to proxy " + inetAddr);
                 }
+            } catch (IOException e) {
+                throw e;
             } catch (Exception e) {
-                Log.e(TAG, "Cannot establishh route to proxy " + inetAddr, e);
+                throw new IOException("Cannot establish route to proxy " + inetAddr, e);
             }
         } else {
             Uri uri = Uri.parse(url);
@@ -165,10 +196,12 @@ public class Utils {
             try {
                 Method requestRoute = ConnectivityManager.class.getMethod("requestRouteToHostAddress", Integer.TYPE, InetAddress.class);
                 if (!((Boolean) requestRoute.invoke(connMgr, ConnectivityManager.TYPE_MOBILE_MMS, inetAddr))) {
-                    throw new IOException("Cannot establish route to proxy " + inetAddr);
+                    throw new IOException("Cannot establish route to host " + inetAddr);
                 }
+            } catch (IOException e) {
+                throw e;
             } catch (Exception e) {
-                Log.e(TAG, "Cannot establishh route to proxy " + inetAddr + " for " + url, e);
+                throw new IOException("Cannot establish route to host " + inetAddr + " for " + url, e);
             }
         }
     }

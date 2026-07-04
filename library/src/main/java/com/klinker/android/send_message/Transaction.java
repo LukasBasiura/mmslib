@@ -469,9 +469,10 @@ public class Transaction {
                 MessageInfo info = getBytes(context, saveMessage, fromAddress, address.split(getAddressSeparatorRegex()),
                         data.toArray(new MMSPart[data.size()]), subject);
                 MmsRequestManager requestManager = new MmsRequestManager(context, info.bytes);
-                SendRequest request = new SendRequest(requestManager, Utils.getDefaultSubscriptionId(),
+                final int subId = Utils.resolveSubscriptionId(settings.getSubscriptionId());
+                SendRequest request = new SendRequest(requestManager, subId,
                         info.location, null, null, null, null);
-                MmsNetworkManager manager = new MmsNetworkManager(context, Utils.getDefaultSubscriptionId());
+                MmsNetworkManager manager = new MmsNetworkManager(context, subId);
                 request.execute(context, manager);
             } catch (Exception e) {
                 Log.e(TAG, "error sending mms", e);

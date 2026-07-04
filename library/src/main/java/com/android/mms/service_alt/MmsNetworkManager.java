@@ -22,7 +22,6 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.NetworkInfo;
-import android.net.SSLCertificateSocketFactory;
 import android.os.Build;
 import android.os.SystemClock;
 
@@ -134,8 +133,10 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
                 } catch (InterruptedException e) {
                     Log.w(TAG, "MmsNetworkManager: acquire network wait interrupted");
                 }
-                if (mNetwork != null || permissionError) {
-                    // Success
+                if (permissionError) {
+                    throw new MmsNetworkException("Permission denied acquiring MMS network");
+                }
+                if (mNetwork != null) {
                     return mNetwork;
                 }
                 // Calculate remaining waiting time to make sure we wait the full timeout period
@@ -205,8 +206,11 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             connectivityManager.requestNetwork(
                     mNetworkRequest, mNetworkCallback);
         } catch (SecurityException e) {
-            Log.e(TAG, "permission exception... skipping it for testing purposes", e);
-            permissionError = true;
+            Log.e(TAG, "permission exception acquiring MMS network", e);
+            synchronized (this) {
+                permissionError = true;
+                notifyAll();
+            }
         }
     }
 
@@ -281,16 +285,9 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         synchronized (this) {
             if (mMmsHttpClient == null) {
                 if (mNetwork != null) {
-                    // Create new MmsHttpClient for the current Network
                     mMmsHttpClient = new MmsHttpClient(
                             mContext,
                             mNetwork.getSocketFactory(),
-                            MmsNetworkManager.this,
-                            getOrCreateConnectionPoolLocked());
-                } else if (permissionError) {
-                    mMmsHttpClient = new MmsHttpClient(
-                            mContext,
-                            new SSLCertificateSocketFactory(NETWORK_REQUEST_TIMEOUT_MILLIS),
                             MmsNetworkManager.this,
                             getOrCreateConnectionPoolLocked());
                 }
@@ -309,9 +306,6 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         synchronized (this) {
             if (mNetwork == null) {
                 Log.d(TAG, "MmsNetworkManager: getApnName: network not available");
-                mNetworkRequest = new NetworkRequest.Builder()
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                        .build();
                 return null;
             }
             network = mNetwork;

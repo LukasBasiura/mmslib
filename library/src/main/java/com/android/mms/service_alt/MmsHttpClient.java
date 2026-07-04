@@ -270,8 +270,8 @@ public class MmsHttpClient {
                 }
             });
             okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT));
-            okHttpClient.setConnectionPool(new ConnectionPool(3, 60000));
-            okHttpClient.setSocketFactory(SocketFactory.getDefault());
+            okHttpClient.setConnectionPool(mConnectionPool);
+            okHttpClient.setSocketFactory(mSocketFactory);
             Internal.instance.setNetwork(okHttpClient, mHostResolver);
 
             if (proxy != null) {
@@ -284,11 +284,20 @@ public class MmsHttpClient {
             okHttpClient.setProtocols(Arrays.asList(Protocol.HTTP_1_1));
             HostnameVerifier verifier = HttpsURLConnection.getDefaultHostnameVerifier();
             okHttpClient.setHostnameVerifier(verifier);
-            okHttpClient.setSslSocketFactory(HttpsURLConnection.getDefaultSSLSocketFactory());
+            if (mSocketFactory instanceof javax.net.ssl.SSLSocketFactory) {
+                okHttpClient.setSslSocketFactory((javax.net.ssl.SSLSocketFactory) mSocketFactory);
+            } else {
+                okHttpClient.setSslSocketFactory(
+                        (javax.net.ssl.SSLSocketFactory) HttpsURLConnection.getDefaultSSLSocketFactory());
+            }
             okHttpClient.setProxySelector(new ProxySelector() {
                 @Override
                 public List<Proxy> select(URI uri) {
-                    return Arrays.asList(proxy);
+                    if (proxy != null) {
+                        return Arrays.asList(proxy);
+                    } else {
+                        return new ArrayList<Proxy>();
+                    }
                 }
 
                 @Override
@@ -307,9 +316,13 @@ public class MmsHttpClient {
                     return null;
                 }
             });
-            okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT));
-            okHttpClient.setConnectionPool(new ConnectionPool(3, 60000));
+            okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS));
+            okHttpClient.setConnectionPool(mConnectionPool);
             Internal.instance.setNetwork(okHttpClient, mHostResolver);
+
+            if (proxy != null) {
+                okHttpClient.setProxy(proxy);
+            }
 
             return new HttpsURLConnectionImpl(url, okHttpClient);
         } else {
