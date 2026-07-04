@@ -8,7 +8,7 @@ group = System.getenv("GROUP")?.takeIf { it.isNotBlank() } ?: "com.github.LukasB
 version = System.getenv("VERSION")?.takeIf { it.isNotBlank() } ?: "1.0.0-SNAPSHOT"
 
 android {
-    compileSdk = 37
+    compileSdk = 36
     namespace = "com.klinker.android.send_message"
 
     defaultConfig {
