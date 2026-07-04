@@ -182,7 +182,7 @@ public class PushReceiver extends BroadcastReceiver {
                             }
 
                             Uri uri = p.persist(pdu, Inbox.CONTENT_URI,
-                                    !NotificationTransaction.allowAutoDownload(mContext),
+                                    !MmsAutoDownload.allowAutoDownload(mContext),
                                     group,
                                     null,
                                     subId);

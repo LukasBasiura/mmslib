@@ -19,7 +19,7 @@ import android.content.Context;
 import android.drm.DrmConvertedStatus;
 import android.drm.DrmManagerClient;
 import android.util.Log;
-import android.provider.Downloads;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,6 +30,11 @@ public class DrmConvertSession {
     private DrmManagerClient mDrmClient;
     private int mConvertSessionId;
     private static final String TAG = "DrmConvertSession";
+
+    private static final int STATUS_SUCCESS = 200;
+    private static final int STATUS_NOT_ACCEPTABLE = 406;
+    private static final int STATUS_FILE_ERROR = 492;
+    private static final int STATUS_UNKNOWN_ERROR = 491;
 
     private DrmConvertSession(DrmManagerClient drmClient, int convertSessionId) {
         mDrmClient = drmClient;
@@ -114,37 +119,37 @@ public class DrmConvertSession {
      * Ends a conversion session of a file.
      *
      * @param filename The filename of the converted file.
-     * @return Downloads.Impl.STATUS_SUCCESS if execution is ok.
-     *         Downloads.Impl.STATUS_FILE_ERROR in case converted file can not
-     *         be accessed. Downloads.Impl.STATUS_NOT_ACCEPTABLE if a problem
+     * @return STATUS_SUCCESS if execution is ok.
+     *         STATUS_FILE_ERROR in case converted file can not
+     *         be accessed. STATUS_NOT_ACCEPTABLE if a problem
      *         occurs when accessing drm framework.
-     *         Downloads.Impl.STATUS_UNKNOWN_ERROR if a general error occurred.
+     *         STATUS_UNKNOWN_ERROR if a general error occurred.
      */
     public int close(String filename) {
         DrmConvertedStatus convertedStatus = null;
-        int result = Downloads.Impl.STATUS_UNKNOWN_ERROR;
+        int result = STATUS_UNKNOWN_ERROR;
         if (mDrmClient != null && mConvertSessionId >= 0) {
             try {
                 convertedStatus = mDrmClient.closeConvertSession(mConvertSessionId);
                 if (convertedStatus == null ||
                         convertedStatus.statusCode != DrmConvertedStatus.STATUS_OK ||
                         convertedStatus.convertedData == null) {
-                    result = Downloads.Impl.STATUS_NOT_ACCEPTABLE;
+                    result = STATUS_NOT_ACCEPTABLE;
                 } else {
                     RandomAccessFile rndAccessFile = null;
                     try {
                         rndAccessFile = new RandomAccessFile(filename, "rw");
                         rndAccessFile.seek(convertedStatus.offset);
                         rndAccessFile.write(convertedStatus.convertedData);
-                        result = Downloads.Impl.STATUS_SUCCESS;
+                        result = STATUS_SUCCESS;
                     } catch (FileNotFoundException e) {
-                        result = Downloads.Impl.STATUS_FILE_ERROR;
+                        result = STATUS_FILE_ERROR;
                         Log.w(TAG, "File: " + filename + " could not be found.", e);
                     } catch (IOException e) {
-                        result = Downloads.Impl.STATUS_FILE_ERROR;
+                        result = STATUS_FILE_ERROR;
                         Log.w(TAG, "Could not access File: " + filename + " .", e);
                     } catch (IllegalArgumentException e) {
-                        result = Downloads.Impl.STATUS_FILE_ERROR;
+                        result = STATUS_FILE_ERROR;
                         Log.w(TAG, "Could not open file in mode: rw", e);
                     } catch (SecurityException e) {
                         Log.w(TAG, "Access to File: " + filename +
@@ -154,7 +159,7 @@ public class DrmConvertSession {
                             try {
                                 rndAccessFile.close();
                             } catch (IOException e) {
-                                result = Downloads.Impl.STATUS_FILE_ERROR;
+                                result = STATUS_FILE_ERROR;
                                 Log.w(TAG, "Failed to close File:" + filename
                                         + ".", e);
                             }

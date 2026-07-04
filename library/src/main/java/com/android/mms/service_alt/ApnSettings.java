@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SqliteWrapper;
-import android.net.NetworkUtilsHelper;
+import com.klinker.android.send_message.NetworkAddressUtils;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
@@ -155,7 +155,7 @@ public class ApnSettings {
                         if (TextUtils.isEmpty(mmscUrl)) {
                             continue;
                         }
-                        mmscUrl = NetworkUtilsHelper.trimV4AddrZeros(mmscUrl);
+                        mmscUrl = NetworkAddressUtils.trimV4AddrZeros(mmscUrl);
                         try {
                             new URI(mmscUrl);
                         } catch (URISyntaxException e) {
@@ -163,7 +163,7 @@ public class ApnSettings {
                         }
                         proxyAddress = trimWithNullCheck(cursor.getString(COLUMN_MMSPROXY));
                         if (!TextUtils.isEmpty(proxyAddress)) {
-                            proxyAddress = NetworkUtilsHelper.trimV4AddrZeros(proxyAddress);
+                            proxyAddress = NetworkAddressUtils.trimV4AddrZeros(proxyAddress);
                             final String portString =
                                     trimWithNullCheck(cursor.getString(COLUMN_MMSPORT));
                             if (portString != null) {

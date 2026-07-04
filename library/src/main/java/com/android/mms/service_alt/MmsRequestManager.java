@@ -23,7 +23,7 @@ import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.util.Log;
 
-import com.android.mms.transaction.NotificationTransaction;
+import com.android.mms.transaction.MmsAutoDownload;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
@@ -54,7 +54,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
 
     @Override
     public boolean getAutoPersistingPref() {
-        return NotificationTransaction.allowAutoDownload(context);
+        return MmsAutoDownload.allowAutoDownload(context);
     }
 
     @Override
